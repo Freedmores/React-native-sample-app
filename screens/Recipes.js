@@ -27,12 +27,14 @@ export default function Recipes({navigation}) {
         var temp = [];
         for (let i = 0; i < results.rows.length; ++i) {
           let item = results.rows.item(i);
+          console.log(item);
           temp.push({
             bread_id: item.bread_id,
             bread_name: item.bread_name,
             bread_image: item.image_url,
             bread_ingredients: item.ingredients,
             bread_preparation: item.preparation,
+            isBreadFavorite: item.fav,
           });
         }
         setItems(temp);

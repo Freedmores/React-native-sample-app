@@ -1,10 +1,47 @@
 import {faL} from '@fortawesome/free-solid-svg-icons';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, Image} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {openDatabase} from 'react-native-sqlite-storage';
 
 export default function RecipeDetail({route, navigation}) {
-  const [favorite, setFavorite] = useState(false);
+  let favorite = 0;
+
+  let db = openDatabase({name: 'bread.db'});
+  let br_id = route.params.bread_id;
+
+  const editFavorite = () => {
+    favorite = 1;
+    db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE bread_table set fav=? where bread_id=?',
+        [favorite, br_id],
+        (tx, results) => {
+          console.log('Results', results.rowsAffected);
+          if (results.rowsAffected > 0) {
+            alert('Recipe added to favorites...');
+          } else alert('Error');
+        },
+      );
+    });
+  };
+
+  const deleteFavorite = () => {
+    favorite = 0;
+    db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE bread_table set fav=? where bread_id=?',
+        [favorite, br_id],
+        (tx, results) => {
+          console.log('Results', results.rowsAffected);
+          if (results.rowsAffected > 0) {
+            alert('Recipe removed from favorites');
+          } else alert('Error');
+        },
+      );
+    });
+  };
+
   return (
     <View>
       <View style={{alignItems: 'center'}}>
@@ -16,18 +53,17 @@ export default function RecipeDetail({route, navigation}) {
           style={{width: 300, height: 300, borderRadius: 10, marginBottom: 16}}
         />
       </View>
-      <View style={{justifyContent: 'flex-start', paddingLeft: 30}}>
-        <TouchableOpacity
-          onPress={() => {
-            favorite ? setFavorite(false) : setFavorite(true);
-          }}>
+      <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+        <TouchableOpacity onPress={editFavorite}>
           <Image
             style={{width: 40, height: 40}}
-            source={
-              favorite
-                ? require('../images/bread_pics/favorite.png')
-                : require('../images/bread_pics/grey_heart.png')
-            }
+            source={require('../images/bread_pics/favorite.png')}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={deleteFavorite}>
+          <Image
+            style={{width: 40, height: 40}}
+            source={require('../images/icons/bin.png')}
           />
         </TouchableOpacity>
       </View>

@@ -18,7 +18,7 @@ export default function AddRecipe({navigation}) {
   const [ingredients, setIngredients] = useState('');
   const [preparation, setPreparation] = useState('');
   const [imageUrl, setImageUrl] = useState(1);
-  const [favorite, setFavorite] = useState(false);
+  const [favorite, setFavorite] = useState(0);
 
   useEffect(() => {
     db.transaction(function (txn) {
@@ -30,7 +30,7 @@ export default function AddRecipe({navigation}) {
           if (res.rows.length == 0) {
             txn.executeSql('DROP TABLE IF EXISTS bread_table', []);
             txn.executeSql(
-              'CREATE TABLE IF NOT EXISTS bread_table (bread_id INTEGER PRIMARY KEY AUTOINCREMENT, bread_name VARCHAR(30), ingredients VARCHAR(800), preparation VARCHAR(900),image_url VARCHAR(100))',
+              'CREATE TABLE IF NOT EXISTS bread_table (bread_id INTEGER PRIMARY KEY AUTOINCREMENT, bread_name VARCHAR(30), ingredients VARCHAR(800), preparation VARCHAR(900),image_url INTEGER,fav INTEGER)',
               [],
             );
           }
@@ -45,8 +45,8 @@ export default function AddRecipe({navigation}) {
     } else {
       db.transaction(function (tx) {
         tx.executeSql(
-          'INSERT INTO bread_table (bread_name, ingredients, preparation,image_url) VALUES (?,?,?,?)',
-          [breadName, ingredients, preparation, imageUrl],
+          'INSERT INTO bread_table (bread_name, ingredients, preparation,image_url,fav) VALUES (?,?,?,?,?)',
+          [breadName, ingredients, preparation, imageUrl, favorite],
           (tx, results) => {
             console.log('Results', results.rowsAffected);
             if (results.rowsAffected > 0) {
